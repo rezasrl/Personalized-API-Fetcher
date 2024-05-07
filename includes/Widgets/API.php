@@ -38,17 +38,19 @@ class PAF_Widget extends WP_Widget {
 		echo $args['before_title'] . esc_html__( 'Personalized API Fetcher Widget', 'personalized-api-fetcher' ) . $args['after_title'];
 
 		$api_data = Main::api_fetch_data();
+		?>
 
-		if ( ! empty( $api_data ) ) {
-			echo '<ul>';
-			foreach ($api_data as $key => $value) {
-				echo '<li>' . $key . ' : ' . $value . '</li>';
-			}
-			echo '</ul>';
-		} else {
-			echo esc_html__( 'No data available.', 'personalized-api-fetcher' );
-		}
+		<ul>
+			<?php if ( ! empty( $api_data ) ) : ?>
+				<?php foreach( $api_data as $key => $value ) : ?>
+					<li><?php echo esc_html( $key . ' : ' . $value ); ?></li>
+				<?php endforeach; ?>
+			<?php else : ?>
+				<li><?php echo esc_html__( 'No data available.', 'personalized-api-fetcher' ); ?></li>
+			<?php endif; ?>
+		</ul>
 
+		<?php
 		echo $args['after_widget'];
 	}
 }
