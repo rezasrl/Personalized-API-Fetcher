@@ -10,6 +10,7 @@ namespace Personalized_Api_Fetcher;
 
 use Personalized_Api_Fetcher\Admin\Main as Admin;
 use Personalized_Api_Fetcher\Front\Main as Front;
+use Personalized_Api_Fetcher\Widgets\PAF_Widget as PAF_Widget;
 
 
 /**
@@ -31,12 +32,15 @@ final class Main {
 	 * Constructor
 	 */
 	public static function bootstrap() {
-
 		register_activation_hook( PLUGIN_FILE, array( Install::class, 'install' ) );
 
 		add_action( 'plugins_loaded', array( __CLASS__, 'load' ) );
 
 		add_action( 'init', array( __CLASS__, 'init' ) );
+
+		require_once plugin_dir_path( __FILE__ ) . 'Widgets/API.php';
+
+		add_action( 'widgets_init', [ __CLASS__, 'register_widget' ] );
 
 		// Perform other actions when plugin is loaded.
 		do_action( 'personalized_api_fetcher_loaded' );
@@ -298,5 +302,9 @@ final class Main {
 		}
 
 		return [];
+	}
+
+	public static function register_widget() {
+		register_widget( 'Personalized_Api_Fetcher\Widgets\PAF_Widget' );
 	}
 }
