@@ -12,20 +12,13 @@
  *
  * @wordpress-plugin
  * Plugin Name: Personalized API Fetcher
- * Description: This is a short description of what the plugin does. It's displayed in the WordPress admin area.
+ * Description: Fetches data from an external API based on user preferences and displays it in a widget and My Account section..
  * Version:     1.0.0
  * Author:      Reza Sarailoo
  * License:     GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain: personalized-api-fetcher
  * Domain Path: /i18n/languages
- */
-
-/**
- * Developer note: updating minimum PHP, WordPress and WooCommerce versions.
- *
- * When updating any version metadata above and below please ensure to update these files:
- * - `phpcs.xml`
  */
 
 namespace Personalized_Api_Fetcher;

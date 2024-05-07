@@ -42,7 +42,7 @@ final class Assets {
 	public static function add_styles( $styles ) {
 
 		$styles['personalized-api-fetcher-admin'] = array(
-			'src' => AssetsMain::localize_asset( 'css/admin/personalized-api-fetcher.css' ),
+			'src' => AssetsMain::localize_asset( 'css/admin/personalized-api-fetcher-admin.css' ),
 		);
 
 		return $styles;
