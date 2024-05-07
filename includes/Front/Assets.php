@@ -32,7 +32,6 @@ final class Assets {
 		add_action( 'wp_print_footer_scripts', array( AssetsMain::class, 'localize_printed_scripts' ), 5 );
 	}
 
-
 	/**
 	 * Add styles for the admin.
 	 *
@@ -47,7 +46,6 @@ final class Assets {
 
 		return $styles;
 	}
-
 
 	/**
 	 * Add scripts for the admin.

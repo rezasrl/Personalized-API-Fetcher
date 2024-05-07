@@ -133,17 +133,17 @@ final class Main {
 
 		if ( ! version_compare( PHP_VERSION, self::PLUGIN_REQUIREMENTS['php_version'], '>=' ) ) {
 			/* Translators: The minimum PHP version */
-			$errors[] = sprintf( esc_html__( 'WordPress Plugin Boilerplate requires a minimum PHP version of %s.', 'personalized-api-fetcher' ), self::PLUGIN_REQUIREMENTS['php_version'] );
+			$errors[] = sprintf( esc_html__( 'Personalized API Fetcher requires a minimum PHP version of %s.', 'personalized-api-fetcher' ), self::PLUGIN_REQUIREMENTS['php_version'] );
 		}
 
 		if ( ! version_compare( $wp_version, self::PLUGIN_REQUIREMENTS['wp_version'], '>=' ) ) {
 			/* Translators: The minimum WP version */
-			$errors[] = sprintf( esc_html__( 'WordPress Plugin Boilerplate requires a minimum WordPress version of %s.', 'personalized-api-fetcher' ), self::PLUGIN_REQUIREMENTS['wp_version'] );
+			$errors[] = sprintf( esc_html__( 'Personalized API Fetcher requires a minimum WordPress version of %s.', 'personalized-api-fetcher' ), self::PLUGIN_REQUIREMENTS['wp_version'] );
 		}
 
 		if ( isset( self::PLUGIN_REQUIREMENTS['wc_version'] ) && ( ! defined( 'WC_VERSION' ) || ! version_compare( WC_VERSION, self::PLUGIN_REQUIREMENTS['wc_version'], '>=' ) ) ) {
 			/* Translators: The minimum WC version */
-			$errors[] = sprintf( esc_html__( 'WordPress Plugin Boilerplate requires a minimum WooCommerce version of %s.', 'personalized-api-fetcher' ), self::PLUGIN_REQUIREMENTS['wc_version'] );
+			$errors[] = sprintf( esc_html__( 'Personalized API Fetcher requires a minimum WooCommerce version of %s.', 'personalized-api-fetcher' ), self::PLUGIN_REQUIREMENTS['wc_version'] );
 		}
 
 		if ( empty( $errors ) ) {
@@ -223,7 +223,7 @@ final class Main {
 
 		<form id="paf_preference_field_form" method="post">
 			<p>
-				<label for="paf_preference_field"><?php _e( 'Enter alphanumeric content separated by commas:', 'woocommerce' ); ?></label><br>
+				<label for="paf_preference_field"><?php _e( 'Enter headers separated by commas. Example: date,content-type,content-length,server,access-control-allow-origin,access-control-allow-credentials', 'woocommerce' ); ?></label><br>
 				<input type="text" id="paf_preference_field" name="paf_preference_field" value="<?php echo esc_attr( get_user_meta( get_current_user_id(), 'paf_preference_field', true ) ); ?>">
 			</p>
 			<p>
@@ -234,7 +234,7 @@ final class Main {
 
 		<h2><?php echo esc_html__( 'Data', 'personalized-api-fetcher' ); ?></h2>
 		<?php
-			$api_data = '';
+			$api_data = self::api_fetch_data();
 
 			if ( ! empty( $api_data ) ) {
 				echo '<ul>';
@@ -247,7 +247,7 @@ final class Main {
 			}
 	}
 
-	function save_preference_field_data() {
+	public static function save_preference_field_data() {
 		if ( isset( $_POST['paf_preference_field'] ) && isset( $_POST['action'] ) && $_POST['action'] == 'save_paf_preference_field' ) {
 			$paf_preference_field_value = sanitize_text_field( $_POST['paf_preference_field'] );
 
@@ -257,5 +257,51 @@ final class Main {
 		}
 
 		wp_die();
+	}
+
+	public static function api_fetch_data() {
+		$user_preferences = get_user_meta( get_current_user_id(), 'paf_preference_field', true );
+		$request_data     = explode( ',', $user_preferences );
+
+		if ( ! empty( $user_preferences ) ) {
+			$args = [
+				'body' => [
+					$request_data,
+				],
+				'timeout' => 30,
+			];
+
+			$response = wp_remote_post( 'https://httpbin.org/post', $args );
+
+			if ( is_wp_error( $response ) ) {
+				return [];
+			}
+
+			$headers = wp_remote_retrieve_headers( $response );
+
+			$headers_array = [];
+
+			foreach ( $headers as $key => $value ) {
+				$headers_array[ $key ] = $value;
+			}
+
+			$values = [];
+
+			foreach ( $request_data as $key ) {
+				if ( array_key_exists( $key, $headers_array ) ) {
+					$values[ $key ] = $headers_array[ $key ];
+				} else {
+					$values[] = '';
+				}
+			}
+
+			if ( ! empty( $values ) ) {
+				return $values;
+			}
+
+			return [];
+		}
+
+		return [];
 	}
 }
