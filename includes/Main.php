@@ -105,7 +105,16 @@ final class Main {
 		// Before init action.
 		do_action( 'before_personalized_api_fetcher_init' );
 
-		// Add needed hooks here.
+		define( 'PAF_MY_ACCOUNT_CUSTOM_ENDPOINT', 'tab' );
+
+		self::add_user_preference_endpoint();
+
+		add_filter( 'query_vars', [ __CLASS__, 'user_preference_query_vars' ], 0 );
+		add_filter( 'woocommerce_account_menu_items', [ __CLASS__, 'add_user_preference_link_my_account' ] );
+		add_action( 'woocommerce_account_paf-user-preferences_endpoint', [ __CLASS__, 'user_preference_content' ] );
+
+		add_action( 'wp_ajax_save_paf_preference_field', [ __CLASS__, 'save_preference_field_data' ] );
+		add_action( 'wp_ajax_nopriv_save_paf_preference_field', [ __CLASS__, 'save_preference_field_data' ] );
 
 		// After init action.
 		do_action( 'personalized_api_fetcher_init' );
@@ -182,5 +191,71 @@ final class Main {
 		load_textdomain( 'personalized-api-fetcher', WP_LANG_DIR . '/personalized-api-fetcher/personalized-api-fetcher-' . $locale . '.mo' );
 
 		load_plugin_textdomain( 'personalized-api-fetcher', false, plugin_basename( dirname( __FILE__ ) ) . '/i18n/languages' );
+	}
+
+	public static function add_user_preference_endpoint() {
+		// Force update rewrite rules only once.
+		$current_rewrite_rule = get_option( 'paf_my_account_custom_tab' );
+
+		if ( ! $current_rewrite_rule || PAF_MY_ACCOUNT_CUSTOM_ENDPOINT !== $current_rewrite_rule ) {
+			flush_rewrite_rules( true );
+			update_option( 'paf_my_account_custom_tab', PAF_MY_ACCOUNT_CUSTOM_ENDPOINT );
+		}
+
+		add_rewrite_endpoint( 'paf-user-preferences', EP_ROOT | EP_PAGES );
+	}
+
+	public static function user_preference_query_vars( $vars ) {
+		$vars[] = 'paf-user-preferences';
+
+		return $vars;
+	}
+
+	public static function add_user_preference_link_my_account( $items ) {
+		$items['paf-user-preferences'] = 'User Preferences';
+
+		return $items;
+	}
+
+	public static function user_preference_content() {
+		?>
+		<h2><?php echo esc_html__( 'Settings', 'personalized-api-fetcher' ); ?></h2>
+
+		<form id="paf_preference_field_form" method="post">
+			<p>
+				<label for="paf_preference_field"><?php _e( 'Enter alphanumeric content separated by commas:', 'woocommerce' ); ?></label><br>
+				<input type="text" id="paf_preference_field" name="paf_preference_field" value="<?php echo esc_attr( get_user_meta( get_current_user_id(), 'paf_preference_field', true ) ); ?>">
+			</p>
+			<p>
+				<input type="submit" class="button" name="submit_paf_preference_field" value="<?php _e( 'Submit', 'woocommerce' ); ?>">
+			</p>
+		</form>
+		<div id="paf_preference_field_message"></div>
+
+		<h2><?php echo esc_html__( 'Data', 'personalized-api-fetcher' ); ?></h2>
+		<?php
+			$api_data = '';
+
+			if ( ! empty( $api_data ) ) {
+				echo '<ul>';
+				foreach ($api_data as $key => $value) {
+					echo '<li>' . $key . ' : ' . $value . '</li>';
+				}
+				echo '</ul>';
+			} else {
+				echo __( 'No data available.', 'personalized-api-fetcher' );
+			}
+	}
+
+	function save_preference_field_data() {
+		if ( isset( $_POST['paf_preference_field'] ) && isset( $_POST['action'] ) && $_POST['action'] == 'save_paf_preference_field' ) {
+			$paf_preference_field_value = sanitize_text_field( $_POST['paf_preference_field'] );
+
+			update_user_meta( get_current_user_id(), 'paf_preference_field', $paf_preference_field_value );
+
+			echo 'success';
+		}
+
+		wp_die();
 	}
 }

@@ -5,6 +5,8 @@ const autoprefixer = require('autoprefixer');
 const rename = require('gulp-rename');
 const eslint = require('gulp-eslint');
 const stylelint = require('gulp-stylelint');
+const concat = require('gulp-concat');
+const uglify = require('gulp-uglify');
 
 function compileAdminStyles() {
     return gulp.src('assets/source/sass/admin/*.scss')
@@ -37,15 +39,24 @@ function lintSCSS() {
         }));
 }
 
+function processJS() {
+    return gulp.src('assets/source/js/frontend/*.js')
+        .pipe(concat('personalized-api-fetcher.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('assets/js/frontend'));
+}
+
 function watch() {
     gulp.watch('assets/source/sass/admin/**/*.scss', compileAdminStyles);
     gulp.watch('assets/source/sass/frontend/**/*.scss', compileFrontendStyles);
     gulp.watch(['**/*.js', '!node_modules/**'], lintJS);
     gulp.watch('assets/source/sass/**/*.scss', lintSCSS);
+    gulp.watch('assets/source/js/frontend/*.js', processJS);
 }
 
 exports.compileAdminStyles = compileAdminStyles;
 exports.compileFrontendStyles = compileFrontendStyles;
 exports.lintJS = lintJS;
 exports.lintSCSS = lintSCSS;
+exports.processJS = processJS;
 exports.watch = watch;

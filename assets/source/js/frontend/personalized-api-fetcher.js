@@ -1,32 +1,25 @@
-(function( $ ) {
+( function( $ ) {
 	'use strict';
 
-	/**
-	 * All of the code for your admin-facing JavaScript source
-	 * should reside in this file.
-	 *
-	 * Note: It has been assumed you will write jQuery code here, so the
-	 * $ function reference has been prepared for usage within the scope
-	 * of this function.
-	 *
-	 * This enables you to define handlers, for when the DOM is ready:
-	 *
-	 * $(function() {
-	 *
-	 * });
-	 *
-	 * When the window is loaded:
-	 *
-	 * $( window ).load(function() {
-	 *
-	 * });
-	 *
-	 * ...and/or other possibilities.
-	 *
-	 * Ideally, it is not considered best practise to attach more than a
-	 * single DOM-ready or window-load handler for a particular page.
-	 * Although scripts in the WordPress core, Plugins and Themes may be
-	 * practising this, we should strive to set a better example in our own work.
-	 */
+	$( '#paf_preference_field_form' ).submit( function( e ) {
+		e.preventDefault();
+		const PafPreferenceField = $( '#paf_preference_field' ).val();
 
-})( jQuery );
+		$.ajax( {
+			type: 'POST',
+			url: personalized_api_fetcher_general_params.ajax_url,
+			data: {
+				action: 'save_paf_preference_field',
+				paf_preference_field: PafPreferenceField,
+			},
+			success: function( response ) {
+				if( response == 'success' ){
+					$( '#paf_preference_field_message' ).html( '<div class="woocommerce-message">Preference field saved successfully.</div>' );
+
+					return;
+				}
+				$( '#paf_preference_field_message' ).html( '<div class="woocommerce-error">Error saving Preference field.</div>' );
+			}
+		} );
+	} );
+} )( jQuery );
