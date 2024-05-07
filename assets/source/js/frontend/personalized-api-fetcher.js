@@ -19,7 +19,7 @@
 					paf_preference_field: PafPreferenceField,
 				},
 				success: function( response ) {
-					const message = '';
+					let message = '';
 					if ( response === 'success' ) {
 						message = '<div class="woocommerce-message">Preference field saved successfully.</div>';
 					} else {
