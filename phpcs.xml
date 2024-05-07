@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="WordPress Coding Standards">
-	<description>WordPress Plugin Boilerplate ruleset.</description>
+	<description>Personalized API Fetcher ruleset.</description>
 
 	<!-- Οnly files with a php extension -->
 	<arg name="extensions" value="php" />

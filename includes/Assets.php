@@ -4,10 +4,10 @@
  *
  * @class       Assets
  * @version     1.0.0
- * @package     Personalized_Api_Fetcher/Classes/
+ * @package     Personalized_API_Fetcher/Classes/
  */
 
-namespace Personalized_Api_Fetcher;
+namespace Personalized_API_Fetcher;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

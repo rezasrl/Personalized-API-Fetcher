@@ -32,7 +32,6 @@ final class Assets {
 		add_action( 'wp_print_footer_scripts', array( AssetsMain::class, 'localize_printed_scripts' ), 5 );
 	}
 
-
 	/**
 	 * Add styles for the admin.
 	 *
@@ -48,7 +47,6 @@ final class Assets {
 		return $styles;
 	}
 
-
 	/**
 	 * Add scripts for the admin.
 	 *
@@ -56,13 +54,12 @@ final class Assets {
 	 * @return array<string,array>
 	 */
 	public static function add_scripts( $scripts ) {
-
-		$scripts['personalized-api-fetcher-general'] = array(
-			'src'  => AssetsMain::localize_asset( 'js/front/personalized-api-fetcher.js' ),
-			'data' => array(
+		$scripts['personalized-api-fetcher-general'] = [
+			'src'  => AssetsMain::localize_asset( 'js/frontend/personalized-api-fetcher.js' ),
+			'data' => [
 				'ajax_url' => Utils::ajax_url(),
-			),
-		);
+			],
+		];
 
 		return $scripts;
 	}
