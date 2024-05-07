@@ -10,8 +10,6 @@ namespace Personalized_Api_Fetcher;
 
 use Personalized_Api_Fetcher\Admin\Main as Admin;
 use Personalized_Api_Fetcher\Front\Main as Front;
-use Personalized_Api_Fetcher\Widgets\PAF_Widget as PAF_Widget;
-
 
 /**
  * Base Plugin class holding generic functionality
@@ -192,8 +190,10 @@ final class Main {
 		load_plugin_textdomain( 'personalized-api-fetcher', false, plugin_basename( dirname( __FILE__ ) ) . '/i18n/languages' );
 	}
 
+	/**
+	 * Adds user preference endpoint and Force update rewrite rules only once.
+	 */
 	public static function add_user_preference_endpoint() {
-		// Force update rewrite rules only once.
 		$current_rewrite_rule = get_option( 'paf_my_account_custom_tab' );
 
 		if ( ! $current_rewrite_rule || PAF_MY_ACCOUNT_CUSTOM_ENDPOINT !== $current_rewrite_rule ) {
@@ -204,18 +204,33 @@ final class Main {
 		add_rewrite_endpoint( 'paf-user-preferences', EP_ROOT | EP_PAGES );
 	}
 
+	/**
+	 * Adds query vars for user preference.
+	 *
+	 * @param array $vars Array of query vars.
+	 * @return array Modified array of query vars.
+	 */
 	public static function user_preference_query_vars( $vars ) {
 		$vars[] = 'paf-user-preferences';
 
 		return $vars;
 	}
 
+	/**
+	 * Adds user preference link to my account menu items.
+	 *
+	 * @param array $items Existing menu items.
+	 * @return array Modified menu items.
+	 */
 	public static function add_user_preference_link_my_account( $items ) {
 		$items['paf-user-preferences'] = 'User Preferences';
 
 		return $items;
 	}
 
+	/**
+	 * Renders user preference content.
+	 */
 	public static function user_preference_content() {
 		?>
 		<h2><?php echo esc_html__( 'Settings', 'personalized-api-fetcher' ); ?></h2>
@@ -246,6 +261,9 @@ final class Main {
 			}
 	}
 
+	/**
+	 * Saves user preference field data.
+	 */
 	public static function save_preference_field_data() {
 		if ( isset( $_POST['paf_preference_field'] ) && isset( $_POST['action'] ) && $_POST['action'] == 'save_paf_preference_field' ) {
 			$paf_preference_field_value = sanitize_text_field( $_POST['paf_preference_field'] );
@@ -258,6 +276,11 @@ final class Main {
 		wp_die();
 	}
 
+	/**
+	 * Fetches API data based on user preferences.
+	 *
+	 * @return array API data.
+	 */
 	public static function api_fetch_data() {
 		$user_preferences = get_user_meta( get_current_user_id(), 'paf_preference_field', true );
 		$request_data     = explode( ',', $user_preferences );
@@ -304,6 +327,9 @@ final class Main {
 		return [];
 	}
 
+	/**
+	 * Registers the widget.
+	 */
 	public static function register_widget() {
 		register_widget( 'Personalized_Api_Fetcher\Widgets\PAF_Widget' );
 	}
